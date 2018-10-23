@@ -24,24 +24,26 @@ app.get('/messages', (req, res) => {
   })
 })
 
-app.post('/messages', (req, res) => {
-  const message = new Message(req.body)
+app.post('/messages', async (req, res) => {
+  try {
+    const message = new Message(req.body)
+    await message.save()
+    console.log('saved')
 
-  message.save()
-    .then(() => Message.findOne({ message: 'bitch' })
-      .then((censored) => {
-        if (censored) {
-          console.log('censored words found: ', censored)
-          return Message.deleteOne({ _id: censored.id })
-        }
-        io.emit('message', req.body)
-        res.sendStatus(200)
-        return Promise.resolve
-      })
-      .catch((err) => {
-        res.sendStatus(500)
-        return console.error(err)
-      }))
+    const censored = await Message.findOne({ message: 'bitch' })
+    if (censored) {
+      await Message.deleteOne({ _id: censored.id })
+    } else {
+      io.emit('message', req.body)
+    }
+
+    res.sendStatus(200)
+  } catch (error) {
+    res.sendStatus(500)
+    console.error(error)
+  } finally {
+    console.log('message post called')
+  }
 })
 
 io.on('connection',

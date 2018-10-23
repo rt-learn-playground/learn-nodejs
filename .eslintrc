@@ -1,9 +1,14 @@
 {
+  "plugins": [
+    "jasmine"
+  ],
   "extends": [
-    "airbnb-base"
+    "airbnb-base",
+    "plugin:jasmine/recommended"
   ],
   "env": {
-    "node": true
+    "node": true,
+    "jasmine": true
   },
   "rules": {
       "semi": [2, "never"],
